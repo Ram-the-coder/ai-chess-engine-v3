@@ -2,7 +2,6 @@
 const config = {
   verbose: true,
   transform: {},
-  extensionsToTreatAsEsm: [".js"],
 };
 
-module.exports = config;
+export default config;

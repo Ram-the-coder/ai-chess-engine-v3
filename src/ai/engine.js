@@ -1,4 +1,5 @@
-import Board from "../board.js";
+import v8Profiler from "v8-profiler-next";
+import fs from "fs";
 import ChessGame from "../game.js";
 import Stats from "../stats.js";
 
@@ -8,13 +9,16 @@ export default class Engine {
    * @param {ChessGame} chessGame
    */
   constructor(chessGame) {
-    this._chessGame = chessGame;
+    this.chessGame = chessGame;
   }
 
   getRecommendedMove(depth = 2) {
+    const title = "myprofile";
+    v8Profiler.setGenerateType(1);
+    v8Profiler.startProfiling(title, true);
     Stats.timer.start("getRecommendedMove");
     const { move, score } = minMax({
-      board: this._chessGame.getBoard(),
+      game: this.chessGame,
       depth,
     });
     Stats.timer.end("getRecommendedMove");
@@ -22,22 +26,20 @@ export default class Engine {
     const timeTaken = Stats.timer.getAverageTimerDuration("getRecommendedMove");
     console.log(`nodes visited: ${nodesCount}`);
     console.log(`time taken: ${timeTaken}`);
-    console.log(`timer per node: ${(nodesCount / timeTaken).toPrecision(3)}`);
-    console.log(
-      `time per boardAfterMove: ${Stats.timer.getAverageTimerDuration(
-        "getBoardAfterMove"
-      )}`
-    );
-    console.log(
-      `count getBoardAfterMove: ${Stats.counter.getCount("getBoardAfterMove")}`
-    );
-    console.log(
-      `total time getBoardAfterMove: ${
-        Stats.counter.getCount("getBoardAfterMove") *
-        Stats.timer.getAverageTimerDuration("getBoardAfterMove")
-      }`
-    );
+    console.log(`timer per node: ${(timeTaken / nodesCount).toPrecision(3)}`);
     Stats.reset();
+    const profile = v8Profiler.stopProfiling(title);
+    profile.export(function (error, result) {
+      // if it doesn't have the extension .cpuprofile then
+      // chrome's profiler tool won't like it.
+      // examine the profile:
+      //   Navigate to chrome://inspect
+      //   Click Open dedicated DevTools for Node
+      //   Select the profiler tab
+      //   Load your file
+      fs.writeFileSync(`${title}.cpuprofile`, result);
+      profile.delete();
+    });
     return move;
   }
 }
@@ -48,7 +50,7 @@ export default class Engine {
  * @property {string} [move]
  *
  * @param {Object} props
- * @param {Board} props.board
+ * @param {ChessGame} props.game
  * @param {number} props.depth
  * @param {boolean} [props.shouldMaximize]
  * @param {number} [props.alpha]
@@ -56,7 +58,7 @@ export default class Engine {
  * @returns {Recommendation} recommendation
  */
 function minMax({
-  board,
+  game,
   depth,
   shouldMaximize = true,
   alpha = -Infinity,
@@ -65,11 +67,11 @@ function minMax({
   Stats.counter.incr("minMax");
 
   // Terminal Node Case
-  if (board.isGameOver()) {
-    if (board.isDraw()) return { score: 0 };
-    return board.isWhiteWinner() ? { score: Infinity } : { score: -Infinity };
+  if (game.isGameOver()) {
+    if (game.isDraw()) return { score: 0 };
+    return game.isWhiteWinner() ? { score: Infinity } : { score: -Infinity };
   }
-  if (depth === 0) return { score: board.getScore() };
+  if (depth === 0) return { score: game.getScore() };
 
   // Non-Terminal Node Case
   let currentAlpha = alpha;
@@ -77,16 +79,22 @@ function minMax({
   let bestScore = shouldMaximize ? -Infinity : Infinity;
   let bestMove = undefined;
 
-  board.getAvailableMoves().forEach((move) => {
+  game.getAvailableMoves().forEach(handleMove);
+  return { score: bestScore, move: bestMove };
+
+  function handleMove(move) {
     if (alpha >= beta) return;
-    const boardAfterMove = board.getBoardAfterMove(move);
+    game.move(move);
+    // const boardAfterMove = board.getBoardAfterMove(move);
     const { score: boardScoreAfterMove } = minMax({
-      board: boardAfterMove,
+      game,
       depth: depth - 1,
       shouldMaximize: !shouldMaximize,
       alpha: currentAlpha,
       beta: currentBeta,
     });
+    game.undo();
+
     const updateBestData = () => {
       bestScore = boardScoreAfterMove;
       bestMove = move;
@@ -103,6 +111,5 @@ function minMax({
         currentBeta = bestScore;
       }
     }
-  });
-  return { score: bestScore, move: bestMove };
+  }
 }

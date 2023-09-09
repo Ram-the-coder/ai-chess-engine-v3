@@ -9,6 +9,7 @@ describe("Chess Game", () => {
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     );
   });
+
   test("can make a move as white", () => {
     const chessGame = new ChessGame();
     chessGame.move("e4");
@@ -27,5 +28,12 @@ describe("Chess Game", () => {
     );
     expect(chessGame.isWhitesTurn).toBe(true);
     expect(chessGame.isBlacksTurn).toBe(false);
+  });
+});
+
+describe("Scoring", () => {
+  test("starting position is equal", () => {
+    const game = new ChessGame();
+    expect(game.getScore()).toEqual(0);
   });
 });

@@ -59,8 +59,7 @@ class NodeJsTimer {
   }
 
   getAverageTimerDuration(timerName) {
-    if (!this.timers.completed[timerName])
-      throw new Error(`timer not found ${timerName}`);
+    if (!this.timers.completed[timerName]) return 0;
     return (
       _.sum(this.timers.completed[timerName]) /
       this.timers.completed[timerName].length
