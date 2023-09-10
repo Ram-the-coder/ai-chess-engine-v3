@@ -2,6 +2,7 @@
 const config = {
   verbose: true,
   transform: {},
+  setupFilesAfterEnv: ["jest-extended/all"],
 };
 
 export default config;

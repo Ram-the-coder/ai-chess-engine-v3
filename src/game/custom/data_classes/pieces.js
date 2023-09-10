@@ -25,6 +25,30 @@ export class Piece {
   isEmpty() {
     return !this.type || !this.color;
   }
+
+  isPawn() {
+    return this.type === PieceType.PAWN;
+  }
+
+  isKnight() {
+    return this.type === PieceType.KNIGHT;
+  }
+
+  isBishop() {
+    return this.type === PieceType.BISHOP;
+  }
+
+  isRook() {
+    return this.type === PieceType.ROOK;
+  }
+
+  isQueen() {
+    return this.type === PieceType.QUEEN;
+  }
+
+  isKing() {
+    return this.type === PieceType.KING;
+  }
 }
 
 export const WhitePawn = new Piece(WHITE, PieceType.PAWN);

@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { BLACK, WHITE } from "./constants";
+import { InvalidSanError, InvalidCoordsError } from "./errors";
 import {
   BlackBishop,
   BlackKing,
@@ -17,9 +18,6 @@ import {
   WhiteRook,
 } from "./data_classes/pieces";
 const { get, set } = _;
-
-class InvalidCoordsError extends Error {}
-class InvalidSanError extends Error {}
 
 const sanToCoordinateMap = {};
 const coordinatesToSanMap = {};
@@ -143,6 +141,11 @@ export default class Board {
     return piece;
   }
 
+  /**
+   * @param {Object} props
+   * @param {Piece} props.piece
+   * @param {string} props.square
+   */
   setPiece({ piece, square }) {
     const [i, j] = sanToCoordinates(square);
     this._board[i][j] = piece;
