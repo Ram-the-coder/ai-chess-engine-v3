@@ -1,8 +1,8 @@
-import ChessGame from "../game";
+import Game from "../game";
 
 describe("Chess Game", () => {
   test("creates a new chess game", () => {
-    const chessGame = new ChessGame();
+    const chessGame = new Game();
     expect(chessGame.isWhitesTurn).toBe(true);
     expect(chessGame.isBlacksTurn).toBe(false);
     expect(chessGame.getFen()).toEqual(
@@ -11,7 +11,7 @@ describe("Chess Game", () => {
   });
 
   test("can make a move as white", () => {
-    const chessGame = new ChessGame();
+    const chessGame = new Game();
     chessGame.move("e4");
     expect(chessGame.getFen()).toEqual(
       "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"
@@ -20,7 +20,7 @@ describe("Chess Game", () => {
     expect(chessGame.isBlacksTurn).toBe(true);
   });
   test("can make move as black", () => {
-    const chessGame = new ChessGame();
+    const chessGame = new Game();
     chessGame.move("e4");
     chessGame.move("e5");
     expect(chessGame.getFen()).toEqual(
@@ -33,7 +33,7 @@ describe("Chess Game", () => {
 
 describe("Scoring", () => {
   test("starting position is equal", () => {
-    const game = new ChessGame();
+    const game = new Game();
     expect(game.getScore()).toEqual(0);
   });
 });

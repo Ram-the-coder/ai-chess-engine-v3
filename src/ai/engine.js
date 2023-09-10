@@ -1,12 +1,11 @@
 import v8Profiler from "v8-profiler-next";
 import fs from "fs";
-import ChessGame from "../game.js";
 import Stats from "../stats.js";
 
 export default class Engine {
   /**
    *
-   * @param {ChessGame} chessGame
+   * @param {import("../game/type.js").Game} chessGame
    */
   constructor(chessGame) {
     this.chessGame = chessGame;
@@ -50,7 +49,7 @@ export default class Engine {
  * @property {string} [move]
  *
  * @param {Object} props
- * @param {ChessGame} props.game
+ * @param {import("../game/type.js").Game} props.game
  * @param {number} props.depth
  * @param {boolean} [props.shouldMaximize]
  * @param {number} [props.alpha]
